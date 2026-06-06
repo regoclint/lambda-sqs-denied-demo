@@ -4,7 +4,7 @@ Demonstrates a Lambda function that fails to send a message to SQS due to missin
 
 ## CI/CD Pipeline (`pipeline.yml`)
 
-Merge to `main` → CodePipeline V2 native trigger detects push → CodeBuild packages SAM template → CloudFormation deploys stack.
+Merge to `main` → CodePipeline triggered every minute via EventBridge schedule → CodeBuild packages SAM template → CloudFormation deploys stack.
 
 ### Deploy the pipeline
 
@@ -16,4 +16,4 @@ aws cloudformation deploy \
   --region us-east-1
 ```
 
-<!-- v2 trigger test -->
+<!-- schedule trigger test -->
