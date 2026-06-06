@@ -1,0 +1,12 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - pip install awscli
+  build:
+    commands:
+      - zip lambda.zip lambda_function.py
+      - aws cloudformation package --template-file template.yml --s3-bucket $ARTIFACT_BUCKET --output-template-file packaged.yml
+artifacts:
+  files:
+    - packaged.yml
