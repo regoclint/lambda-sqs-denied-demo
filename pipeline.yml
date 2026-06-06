@@ -9,9 +9,9 @@ Parameters:
   GitHubBranch:
     Type: String
     Default: main
-  GitHubOAuthToken:
+  CodeStarConnectionArn:
     Type: String
-    NoEcho: true
+    Default: arn:aws:codestar-connections:us-east-1:314820560132:connection/ecbad751-4a24-4bbd-84a1-5db38cf18bdb
 
 Resources:
   ArtifactBucket:
@@ -75,15 +75,14 @@ Resources:
             - Name: GitHub
               ActionTypeId:
                 Category: Source
-                Owner: ThirdParty
-                Provider: GitHub
+                Owner: AWS
+                Provider: CodeStarSourceConnection
                 Version: '1'
               Configuration:
-                Owner: !Ref GitHubOwner
-                Repo: !Ref GitHubRepo
-                Branch: !Ref GitHubBranch
-                OAuthToken: !Ref GitHubOAuthToken
-                PollForSourceChanges: false
+                ConnectionArn: !Ref CodeStarConnectionArn
+                FullRepositoryId: !Sub '${GitHubOwner}/${GitHubRepo}'
+                BranchName: !Ref GitHubBranch
+                DetectChanges: true
               OutputArtifacts:
                 - Name: SourceArtifact
         - Name: Build
