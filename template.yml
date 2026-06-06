@@ -4,13 +4,10 @@ Transform: AWS::Serverless-2016-10-31
 Resources:
   SQSQueue:
     Type: AWS::SQS::Queue
-    Properties:
-      QueueName: demo-blocked-queue
 
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: demo-lambda-no-sqs-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -24,16 +21,17 @@ Resources:
   LambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: demo-sqs-denied
       Handler: lambda_function.handler
       Runtime: python3.12
       CodeUri: .
       Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref SQSQueue
 
   ErrorAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmName: demo-sqs-denied-errors
       AlarmDescription: Fires when Lambda throws AccessDenied on SQS SendMessage
       Namespace: AWS/Lambda
       MetricName: Errors
