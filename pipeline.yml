@@ -82,7 +82,7 @@ Resources:
                 ConnectionArn: !Ref CodeStarConnectionArn
                 FullRepositoryId: !Sub '${GitHubOwner}/${GitHubRepo}'
                 BranchName: !Ref GitHubBranch
-                DetectChanges: true
+                DetectChanges: false
               OutputArtifacts:
                 - Name: SourceArtifact
         - Name: Build
@@ -115,3 +115,27 @@ Resources:
                 RoleArn: !GetAtt PipelineRole.Arn
               InputArtifacts:
                 - Name: BuildArtifact
+
+  PipelineTriggerRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub 'codepipeline-${Pipeline}-source-trigger'
+      EventPattern:
+        source:
+          - aws.codeconnections
+        detail-type:
+          - CodeStarSourceConnection Code Push
+        detail:
+          referenceType:
+            - branch
+          referenceName:
+            - !Ref GitHubBranch
+          connectionArn:
+            - !Ref CodeStarConnectionArn
+          repositoryName:
+            - !Sub '${GitHubOwner}/${GitHubRepo}'
+      State: ENABLED
+      Targets:
+        - Id: !Ref Pipeline
+          Arn: !Sub 'arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${Pipeline}'
+          RoleArn: !GetAtt PipelineRole.Arn
