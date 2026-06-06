@@ -5,7 +5,8 @@ logger.setLevel(logging.INFO)
 
 def handler(event, context):
     queue_url = os.environ["QUEUE_URL"]
-    logger.info("Handler invoked. Event: %s", event)
+    logger.info("Handler invoked. RequestId: %s", context.aws_request_id)
+    logger.info("Event: %s", event)
     logger.info("Attempting to send message to SQS queue: %s", queue_url)
     try:
         sqs = boto3.client("sqs", region_name="us-east-1")
