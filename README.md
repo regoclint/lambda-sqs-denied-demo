@@ -9,7 +9,7 @@ Demonstrates a Lambda function that fails to send a message to SQS due to missin
 
 ## CI/CD Pipeline (`pipeline.yml`)
 
-Merge to `main` → CodePipeline → CodeBuild packages SAM template → CloudFormation deploys stack.
+Merge to `main` → EventBridge rule detects push → CodePipeline → CodeBuild packages SAM template → CloudFormation deploys stack.
 
 ### Deploy the pipeline
 
@@ -17,7 +17,6 @@ Merge to `main` → CodePipeline → CodeBuild packages SAM template → CloudFo
 aws cloudformation deploy \
   --template-file pipeline.yml \
   --stack-name lambda-sqs-denied-pipeline \
-  --parameter-overrides GitHubOAuthToken=<your-token> \
   --capabilities CAPABILITY_IAM \
   --region us-east-1
 ```
