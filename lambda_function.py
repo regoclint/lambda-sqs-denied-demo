@@ -4,7 +4,14 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def handler(event, context):
-    logger.info("Attempting to send message to SQS queue: %s", os.environ["QUEUE_URL"])
-    sqs = boto3.client("sqs", region_name="us-east-1")
-    sqs.send_message(QueueUrl=os.environ["QUEUE_URL"], MessageBody="hello from lambda")
-    return {"status": "sent"}
+    queue_url = os.environ["QUEUE_URL"]
+    logger.info("Handler invoked. Event: %s", event)
+    logger.info("Attempting to send message to SQS queue: %s", queue_url)
+    try:
+        sqs = boto3.client("sqs", region_name="us-east-1")
+        response = sqs.send_message(QueueUrl=queue_url, MessageBody="hello from lambda")
+        logger.info("Message sent successfully. MessageId: %s", response["MessageId"])
+        return {"status": "sent", "messageId": response["MessageId"]}
+    except Exception as e:
+        logger.error("Failed to send message to SQS: %s", str(e))
+        raise
