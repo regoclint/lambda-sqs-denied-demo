@@ -122,7 +122,7 @@ Resources:
       Name: !Sub 'codepipeline-${Pipeline}-source-trigger'
       EventPattern:
         source:
-          - aws.codeconnections
+          - aws.codestar-connections
         detail-type:
           - CodeStarSourceConnection Code Push
         detail:
