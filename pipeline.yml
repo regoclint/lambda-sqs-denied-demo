@@ -11,7 +11,7 @@ Parameters:
     Default: main
   CodeStarConnectionArn:
     Type: String
-    Default: arn:aws:codestar-connections:us-east-1:314820560132:connection/ecbad751-4a24-4bbd-84a1-5db38cf18bdb
+    Default: arn:aws:codeconnections:us-east-1:314820560132:connection/a1a8cda9-df23-40a5-81df-642c3a9a429f
 
 Resources:
   ArtifactBucket:
@@ -66,9 +66,18 @@ Resources:
     Properties:
       Name: lambda-sqs-denied-pipeline
       RoleArn: !GetAtt PipelineRole.Arn
+      PipelineType: V2
       ArtifactStore:
         Type: S3
         Location: !Ref ArtifactBucket
+      Triggers:
+        - ProviderType: CodeStarSourceConnection
+          GitConfiguration:
+            SourceActionName: GitHub
+            Push:
+              - Branches:
+                  Includes:
+                    - !Ref GitHubBranch
       Stages:
         - Name: Source
           Actions:
@@ -115,27 +124,3 @@ Resources:
                 RoleArn: !GetAtt PipelineRole.Arn
               InputArtifacts:
                 - Name: BuildArtifact
-
-  PipelineTriggerRule:
-    Type: AWS::Events::Rule
-    Properties:
-      Name: !Sub 'codepipeline-${Pipeline}-source-trigger'
-      EventPattern:
-        source:
-          - aws.codestar-connections
-        detail-type:
-          - CodeStarSourceConnection Code Push
-        detail:
-          referenceType:
-            - branch
-          referenceName:
-            - !Ref GitHubBranch
-          connectionArn:
-            - !Ref CodeStarConnectionArn
-          repositoryName:
-            - !Sub '${GitHubOwner}/${GitHubRepo}'
-      State: ENABLED
-      Targets:
-        - Id: !Ref Pipeline
-          Arn: !Sub 'arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${Pipeline}'
-          RoleArn: !GetAtt PipelineRole.Arn
